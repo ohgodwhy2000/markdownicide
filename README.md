@@ -6,4 +6,4 @@ Markdownicide is a distraction-free, VS Code-like, Obsidian-inspired Markdown ed
 
 ## Overview
 
-Markdownicide is VS Code if it had a baby with Obsidian. It has wiki-like linking (`[Page](./page)`) to other notes, even if they're in different folders.
+Markdownicide is VS Code if it had a baby with Obsidian. It has wiki-like linking (`[Page](./page)`) to other notes, even if they're in different folders. It even has a note web, where nodes connect if your notes mention each other.
