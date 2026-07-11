@@ -363,7 +363,9 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
       else if (m[7] !== undefined) out += "<del>" + escapeHtml(m[8]) + "</del>";
       else if (m[9] !== undefined) {
         const cleanUrl = m[10].replace(/^[\s\x00-\x1F]+/g, "");
-        const safeUrl = /^(https?:|\/\/)/i.test(cleanUrl) ? cleanUrl : "#";
+        const safeUrl = /^(https?:|mailto:|tel:|\/\/|\/|#)/i.test(cleanUrl)
+          ? cleanUrl
+          : "#";
         out +=
           '<a href="' +
           escapeHtml(safeUrl).replace(/"/g, "&quot;") +
