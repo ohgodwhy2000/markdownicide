@@ -29,6 +29,38 @@
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
   }
+  function slugifyPath(path) {
+    return String(path)
+      .split("/")
+      .map(function (segment) {
+        return slugify(segment);
+      })
+      .filter(Boolean)
+      .join("/");
+  }
+  function getNotePath(note) {
+    return getFolderPath(note.folderId)
+      .concat([note.name])
+      .map(function (segment) {
+        return slugify(segment);
+      })
+      .join("/");
+  }
+  function findNoteByLinkTarget(target) {
+    const normalized = slugifyPath(target);
+    if (!normalized) return null;
+    const notes = Object.values(vault.notes);
+    const byPath = notes.find(function (n) {
+      return getNotePath(n) === normalized;
+    });
+    if (byPath) return byPath;
+    if (normalized.indexOf("/") === -1) {
+      return notes.find(function (n) {
+        return slugify(n.name) === normalized;
+      });
+    }
+    return null;
+  }
   function downloadBlob(content, filename, type) {
     const blob = new Blob([content], { type: type });
     const url = URL.createObjectURL(blob);
@@ -937,10 +969,7 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
     const a = e.target.closest && e.target.closest("a.md-link");
     if (a && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      const target = slugify(a.dataset.href);
-      const found = Object.values(vault.notes).find(function (n) {
-        return slugify(n.name) === target;
-      });
+      const found = findNoteByLinkTarget(a.dataset.href);
       if (found) openNote(found.id);
     } else if (a) {
       e.preventDefault();
@@ -979,19 +1008,16 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
     const nodes = notes.map(function (n) {
       return { id: n.id, name: n.name };
     });
-    const nameToId = {};
-    notes.forEach(function (n) {
-      nameToId[slugify(n.name)] = n.id;
-    });
     const links = [];
     const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
     notes.forEach(function (n) {
       let m;
       linkRe.lastIndex = 0;
       while ((m = linkRe.exec(n.content))) {
-        const targetId = nameToId[slugify(m[2])];
-        if (targetId && targetId !== n.id) {
-          links.push({ source: n.id, target: targetId });
+        const target = m[2];
+        const found = findNoteByLinkTarget(target);
+        if (found && found.id !== n.id) {
+          links.push({ source: n.id, target: found.id });
         }
       }
     });
