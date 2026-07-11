@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = 8675;
+const STATIC_ROOT = path.resolve(__dirname, "..", "src");
 
 const MIME_TYPES = {
   ".html": "text/html",
@@ -20,12 +21,27 @@ const MIME_TYPES = {
 http
   .createServer((req, res) => {
     // Default to index.html if the root is requested
-    let filePath = path.join(
-      __dirname,
-      "..",
-      "src",
-      req.url === "/" ? "index.html" : req.url,
-    );
+    let pathname;
+    try {
+      pathname = decodeURIComponent(
+        new URL(req.url || "/", "http://localhost").pathname,
+      );
+    } catch {
+      res.writeHead(400, { "Content-Type": "text/plain" });
+      return res.end("400: Bad Request");
+    }
+
+    const requestedPath =
+      pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
+    const filePath = path.resolve(STATIC_ROOT, requestedPath);
+
+    if (
+      filePath !== STATIC_ROOT &&
+      !filePath.startsWith(`${STATIC_ROOT}${path.sep}`)
+    ) {
+      res.writeHead(403, { "Content-Type": "text/plain" });
+      return res.end("403: Forbidden");
+    }
     let extname = path.extname(filePath);
     let contentType = MIME_TYPES[extname] || "application/octet-stream";
 
