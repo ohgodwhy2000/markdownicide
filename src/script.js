@@ -74,8 +74,10 @@
   }
   function getFolderPath(folderId) {
     const path = [];
+    const visited = new Set();
     let f = vault.folders[folderId];
-    while (f && f.id !== "root") {
+    while (f && f.id !== "root" && !visited.has(f.id)) {
+      visited.add(f.id);
       path.unshift(f.name);
       f = vault.folders[f.parentId];
     }
