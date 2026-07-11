@@ -359,13 +359,15 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
         out += "<strong>" + escapeHtml(m[4]) + "</strong>";
       else if (m[5] !== undefined) out += "<em>" + escapeHtml(m[6]) + "</em>";
       else if (m[7] !== undefined) out += "<del>" + escapeHtml(m[8]) + "</del>";
-      else if (m[9] !== undefined)
+      else if (m[9] !== undefined) {
+        const safeUrl = /^\s*javascript:/i.test(m[10]) ? "#" : m[10];
         out +=
           '<a href="' +
-          escapeHtml(m[10]).replace(/"/g, "&quot;") +
+          escapeHtml(safeUrl).replace(/"/g, "&quot;") +
           '">' +
           escapeHtml(m[9]) +
           "</a>";
+      }
       lastIndex = INLINE_TOKEN_RE.lastIndex;
     }
     out += escapeHtml(raw.slice(lastIndex));
