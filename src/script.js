@@ -314,7 +314,7 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
       );
     }
     if (/^(-{3,}|\*{3,}|_{3,})$/.test(raw)) {
-      return '<span class="md-hr"></span>';
+      return '<span class="md-mark md-hr">' + escapeHtml(raw) + "</span>";
     }
     return inlineFormat(raw);
   }
