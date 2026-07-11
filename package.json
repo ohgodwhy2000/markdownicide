@@ -1,0 +1,19 @@
+{
+  "name": "@ohgodwhy2000/cobalt",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "start": "node scripts/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohgodwhy2000/cobalt.git"
+  },
+  "keywords": [],
+  "author": "ohgodwhy2000",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/ohgodwhy2000/cobalt/issues"
+  },
+  "homepage": "https://github.com/ohgodwhy2000/cobalt#readme"
+}
