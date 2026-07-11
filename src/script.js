@@ -121,7 +121,11 @@
           resolve(request && request.result);
         };
         tx.onabort = tx.onerror = function () {
-          reject(tx.error || (request && request.error) || new Error("IndexedDB transaction failed"));
+          reject(
+            tx.error ||
+              (request && request.error) ||
+              new Error("IndexedDB transaction failed"),
+          );
         };
       });
     });
