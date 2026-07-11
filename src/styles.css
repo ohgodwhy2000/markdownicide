@@ -329,7 +329,8 @@ code {
   gap: 6px;
   margin-left: 8px;
 }
-.tree-row:hover .tree-actions {
+.tree-row:hover .tree-actions,
+.tree-row:focus-within .tree-actions {
   display: flex;
   animation: fadeIn 0.12s ease;
 }
