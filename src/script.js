@@ -49,16 +49,71 @@
     }
     return path;
   }
+
+  const DB_NAME = "markdownicide";
+  const DB_STORE = "vault";
+  const DB_KEY = "vault";
+  const idbSupported = !!window.indexedDB;
+
+  function openDB() {
+    return new Promise(function (resolve, reject) {
+      if (!idbSupported) return reject(new Error("IndexedDB not supported"));
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = function (event) {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) {
+          db.createObjectStore(DB_STORE);
+        }
+      };
+      request.onsuccess = function (event) {
+        resolve(event.target.result);
+      };
+      request.onerror = function (event) {
+        reject(event.target.error || new Error("IndexedDB open failed"));
+      };
+    });
+  }
+
+  function idbTransaction(mode, callback) {
+    return openDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        const tx = db.transaction(DB_STORE, mode);
+        const store = tx.objectStore(DB_STORE);
+        let request;
+        try {
+          request = callback(store);
+        } catch (err) {
+          reject(err);
+        }
+        tx.oncomplete = function () {
+          resolve(request && request.result);
+        };
+        tx.onabort = tx.onerror = function () {
+          reject(tx.error || (request && request.error) || new Error("IndexedDB transaction failed"));
+        };
+      });
+    });
+  }
+
+  function idbGet(key) {
+    return idbTransaction("readonly", function (store) {
+      return store.get(key);
+    });
+  }
+
+  function idbPut(key, value) {
+    return idbTransaction("readwrite", function (store) {
+      return store.put(value, key);
+    });
+  }
+
   function scheduleSave() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
-      try {
-        if (window.storage && window.storage.set) {
-          window.storage.set("vault", JSON.stringify(vault), false);
-        }
-      } catch (e) {
+      if (!idbSupported) return;
+      idbPut(DB_KEY, JSON.stringify(vault)).catch(function (e) {
         console.error("save failed", e);
-      }
+      });
     }, 350);
   }
 
@@ -1157,25 +1212,28 @@ This one links straight back to [Entry](./entry) too, closing the loop in the gr
   /* ============ Init ============ */
   async function init() {
     wireUp();
+    if (!idbSupported) {
+      seedVault();
+      renderAll();
+      return;
+    }
+
     try {
-      if (window.storage && window.storage.get) {
-        const res = await window.storage.get("vault", false);
-        if (res && res.value) {
-          vault = JSON.parse(res.value);
-          if (!vault.folders.root)
-            vault.folders.root = {
-              id: "root",
-              name: "Vault",
-              parentId: null,
-            };
-        } else {
-          seedVault();
-          scheduleSave();
-        }
+      const result = await idbGet(DB_KEY);
+      if (result) {
+        vault = JSON.parse(result);
+        if (!vault.folders.root)
+          vault.folders.root = {
+            id: "root",
+            name: "Vault",
+            parentId: null,
+          };
       } else {
         seedVault();
+        scheduleSave();
       }
     } catch (e) {
+      console.error("IndexedDB load failed", e);
       seedVault();
       scheduleSave();
     }
