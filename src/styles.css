@@ -678,7 +678,7 @@ code {
 .graph-node text {
   font-family: var(--sans);
   font-size: 12px;
-  fill: var(--bg);
+  fill: #808080;
   user-select: none;
 }
 .graph-node {
