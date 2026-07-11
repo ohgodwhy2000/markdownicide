@@ -2,8 +2,8 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
 
 {
-	"name": "Node.js",
-	"image": "mcr.microsoft.com/devcontainers/javascript-node:4-22-trixie",
-	"forwardPorts": [8675],
-	"postCreateCommand": "npm ci"
+  "name": "Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:4-22-trixie",
+  "forwardPorts": [8675],
+  "postCreateCommand": "npm ci"
 }

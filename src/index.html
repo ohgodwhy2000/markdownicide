@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Markdownicide</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@24,400,0,0"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="mobile-block">
+      <span class="material-symbols-sharp">desktop_windows</span>
+      <h1>Markdownicide is a desktop app</h1>
+      <p>
+        It's built for a keyboard and a wide window. Open it on a laptop or
+        desktop computer to use it.
+      </p>
+    </div>
+
+    <div id="app">
+      <div id="titlebar">
+        <img src="favicon.svg" alt="App Logo" class="app-icon" />
+        <span class="app-name">Markdownicide</span>
+        <div style="flex: 1"></div>
+      </div>
+
+      <div id="main-layout">
+        <div id="rail">
+          <button class="rail-btn active" data-view="files" title="Files">
+            <span class="material-symbols-sharp">description</span>
+          </button>
+          <button class="rail-btn" data-view="search" title="Search vault">
+            <span class="material-symbols-sharp">search</span>
+          </button>
+          <button class="rail-btn" data-view="vault" title="Vault actions">
+            <span class="material-symbols-sharp">inventory_2</span>
+          </button>
+        </div>
+
+        <div id="sidebar2">
+          <div class="sb-view active" id="view-files">
+            <div class="sb-header">
+              Files
+              <div class="sb-toolbar">
+                <button
+                  class="icon-btn"
+                  id="btn-new-note-root"
+                  title="New note"
+                >
+                  <span class="material-symbols-sharp">note_add</span>
+                </button>
+                <button
+                  class="icon-btn"
+                  id="btn-new-folder-root"
+                  title="New folder"
+                >
+                  <span class="material-symbols-sharp">create_new_folder</span>
+                </button>
+              </div>
+            </div>
+            <div id="files-tree"></div>
+          </div>
+
+          <div class="sb-view" id="view-search">
+            <div class="sb-header">Search vault</div>
+            <div class="search-box">
+              <input
+                id="search-input"
+                type="text"
+                class="search-input"
+                placeholder="Search notes…"
+              />
+            </div>
+            <div id="search-results">
+              <div class="empty-hint">
+                Type to search across every note's title and contents.
+              </div>
+            </div>
+          </div>
+
+          <div class="sb-view" id="view-vault">
+            <div class="sb-header">Vault</div>
+            <div class="vault-body">
+              <div class="vault-stats">
+                <div class="stat-box">
+                  <div class="stat-num" id="stat-notes">0</div>
+                  <div class="stat-label">Notes</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-num" id="stat-folders">0</div>
+                  <div class="stat-label">Folders</div>
+                </div>
+              </div>
+              <div class="vault-section-label">Export</div>
+              <button class="vault-btn" id="btn-export-json">
+                <span class="material-symbols-sharp">download</span>Export vault
+                (.json)
+              </button>
+              <button class="vault-btn" id="btn-export-zip">
+                <span class="material-symbols-sharp">folder_zip</span>Export all
+                notes (.zip)
+              </button>
+              <div class="vault-section-label">Import</div>
+              <label class="vault-btn" for="import-input"
+                ><span class="material-symbols-sharp">upload</span>Import vault
+                (.json)</label
+              >
+              <input
+                type="file"
+                id="import-input"
+                accept=".json"
+                style="display: none"
+              />
+              <div class="vault-section-label">Danger zone</div>
+              <button class="vault-btn danger" id="btn-clear-vault">
+                <span class="material-symbols-sharp">delete_forever</span>Clear
+                entire vault
+              </button>
+              <div class="vault-hint">
+                Clearing the vault permanently deletes every folder and note.
+                Export a backup first if you want to keep a copy.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="content">
+          <div id="graph-wrap">
+            <div id="graph-header">
+              <span class="material-symbols-sharp">hub</span>
+              Vault graph — click a note to open it. Link notes with
+              <code>[Text](./note-name)</code>
+            </div>
+            <svg id="graph"></svg>
+          </div>
+
+          <div id="editor-wrap">
+            <div id="editor-header">
+              <div id="breadcrumb"></div>
+              <div class="export-btns">
+                <button
+                  class="export-btn"
+                  id="exp-md"
+                  title="Export as Markdown"
+                >
+                  <span class="material-symbols-sharp">description</span>.MD
+                </button>
+                <button class="export-btn" id="exp-html" title="Export as HTML">
+                  <span class="material-symbols-sharp">code</span>.HTML
+                </button>
+                <button class="export-btn" id="exp-pdf" title="Export as PDF">
+                  <span class="material-symbols-sharp">picture_as_pdf</span>.PDF
+                </button>
+                <button class="icon-btn" id="btn-close-note" title="Close note">
+                  <span class="material-symbols-sharp">close</span>
+                </button>
+              </div>
+            </div>
+            <div id="editor-scroll">
+              <div id="editor" contenteditable="true" spellcheck="false"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

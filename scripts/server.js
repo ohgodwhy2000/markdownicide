@@ -22,6 +22,7 @@ http
     // Default to index.html if the root is requested
     let filePath = path.join(
       __dirname,
+      "..",
       "src",
       req.url === "/" ? "index.html" : req.url,
     );
