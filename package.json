@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/ohgodwhy2000/markdownicide#readme",
   "devDependencies": {
-    "eslint": "^10.7.0",
     "prettier": "^3.9.5"
   }
 }
